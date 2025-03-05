@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { requestCatalog, requestMoreCatalogItems } from "../slices/catalogSlice";
+import { requestCatalog, requestMoreCatalogItems, saveSearchQuery } from "../slices/catalogSlice";
 import { requestTopSales } from "../slices/topSalesSlice";
+import { selectCategory } from "../slices/categoriesSlice";
 import { Loader, Error, Section, Banner, TopSales, Categories, Catalog, LoadMoreButton } from "../components";
 
 const HomePage = () => {
@@ -11,6 +12,9 @@ const HomePage = () => {
   const { catalog, loading, error, newProductsCount } = useAppSelector((state) => state.catalog);
 
   useEffect(() => {
+    dispatch(selectCategory(null));
+    dispatch(saveSearchQuery(""));
+
     dispatch(requestTopSales());
     dispatch(requestCatalog());
   }, [dispatch]);
