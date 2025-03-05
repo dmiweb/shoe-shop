@@ -26,10 +26,11 @@ const CatalogPage = () => {
       <Banner />
       <Section className="catalog">
         <h2 className="text-center">Каталог</h2>
-        <Search className="catalog-search-form form-inline" clearOnSubmit={false}/>
+        <Search className="catalog-search-form form-inline" clearOnSubmit={false} />
         {<Categories />}
         {catalog.length ? <Catalog catalog={catalog} /> : null}
-        {!catalog.length && searchQuery ? <div className="text-center fs-4">Товары не найдены</div> : null}
+        {!loading && !catalog.length && searchQuery ?
+          <div className="text-center fs-4">Товары не найдены</div> : null}
         {loading && <Loader />}
         {error && !loading && <div><Error message={error} handler={handleCatalogError} /></div>}
         {catalog.length && newProductsCount === 6 ? <LoadMoreButton handler={handleLoadMoreButton} /> : null}
