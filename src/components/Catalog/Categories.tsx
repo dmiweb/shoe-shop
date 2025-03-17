@@ -20,6 +20,9 @@ const Categories = () => {
 
     dispatch(selectCategory(null));
     dispatch(requestCatalog());
+
+    
+    window.history.replaceState({}, '', window.location.pathname);
   }
 
   const handleClickCategory = (event: React.MouseEvent<HTMLAnchorElement>, id: number) => {
@@ -27,6 +30,8 @@ const Categories = () => {
 
     dispatch(selectCategory(id));
     dispatch(requestCatalogByCategory(id));
+
+    window.history.pushState({}, '', `?category=${id}`);
   }
 
   const getClassNameLink = (categoryId: number | null): string => {
@@ -35,29 +40,29 @@ const Categories = () => {
 
   return (
     categories.length ?
-    <ul className="catalog-categories nav justify-content-center">
-      <li className="nav-item">
-        <Link
-          to="#"
-          className={getClassNameLink(null)}
-          onClick={(event) => handleClickCategoryAll(event)}
-        >
-          Все
-        </Link>
-      </li>
-      {
-        categories.map((item) =>
-          <li key={item.id} className="nav-item">
-            <Link
-              to="#"
-              className={getClassNameLink(item.id)}
-              onClick={(event) => handleClickCategory(event, item.id)}>
-              {item.title}
-            </Link>
-          </li>
-        )
-      }
-    </ul> : null
+      <ul className="catalog-categories nav justify-content-center">
+        <li className="nav-item">
+          <Link
+            to="#"
+            className={getClassNameLink(null)}
+            onClick={(event) => handleClickCategoryAll(event)}
+          >
+            Все
+          </Link>
+        </li>
+        {
+          categories.map((item) =>
+            <li key={item.id} className="nav-item">
+              <Link
+                to="#"
+                className={getClassNameLink(item.id)}
+                onClick={(event) => handleClickCategory(event, item.id)}>
+                {item.title}
+              </Link>
+            </li>
+          )
+        }
+      </ul> : null
   );
 }
 
