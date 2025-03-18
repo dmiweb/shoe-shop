@@ -33,6 +33,11 @@ export const categoriesSlice = createSlice({
       state.error = null;
       state.loading = false;
     }),
+    cancelRequestCategories: create.reducer((state, _: PayloadAction) => {
+      state.selectedCategory = null;
+      state.error = null;
+      state.loading = false;
+    }),
   })
 });
 
@@ -40,7 +45,8 @@ export const {
   requestCategories,
   getCategoriesSuccess,
   getCategoriesFailure,
-  selectCategory
+  selectCategory,
+  cancelRequestCategories
 } = categoriesSlice.actions;
 
 export default categoriesSlice.reducer;

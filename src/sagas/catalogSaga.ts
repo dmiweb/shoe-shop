@@ -1,8 +1,14 @@
-import { put, spawn, takeLatest, cancelled, retry, select } from "redux-saga/effects";
+import { put, spawn, takeLatest, cancelled, call, delay, select } from "redux-saga/effects";
 import { PayloadAction } from '@reduxjs/toolkit';
 import { requestCatalog, requestMoreCatalogItems, requestCatalogByCategory, getCatalogSuccess, getCatalogFailure } from "../slices/catalogSlice";
 import { fetchData } from "../api";
-import { TCatalogItem, TGetParams } from "../models";
+import { TCatalogItem, TGetParams, RetryRequestConfig } from "../models";
+
+const retryRequestConfig: RetryRequestConfig = {
+  initialDelay: 5 * 100,
+  maxDelay: 5 * 1000,
+  exponent: 2,
+};
 
 type HandleGetCatalogAction =
   | PayloadAction<void, typeof requestCatalog.type>
@@ -33,30 +39,42 @@ function* handleGetCatalogSaga(action: HandleGetCatalogAction): Generator {
     url = `${url}${queryString ? `?${queryString}` : ""}`;
   }
 
-  try {
-    const retryCount = 3;
-    const retryDelay = 3 * 1000;
-    const catalog: TCatalogItem[] = yield retry(
-      retryCount,
-      retryDelay,
-      fetchData,
-      url,
-      signal
-    );
+  let attempt = 0;
 
-    yield put(getCatalogSuccess(catalog));
-  } catch (error: unknown) {
-    void error;
-    
-    if (!navigator.onLine) {
-      yield put(getCatalogFailure("Нет соединения с интернетом!"));
-    } else {
-      yield put(getCatalogFailure("Не удалось загрузить товары!"));
+  while (true) {
+    if (attempt === 4) break;
+
+    try {
+      attempt++;
+
+      const catalog: TCatalogItem[] = yield call(fetchData, url, signal);
+
+      yield put(getCatalogSuccess(catalog));
+      break;
+    } catch (error: unknown) {
+      void error;
+      if (attempt === 4) {
+        if (!navigator.onLine) {
+          yield put(getCatalogFailure("Нет соединения с интернетом!"));
+        } else {
+          yield put(getCatalogFailure("Не удалось загрузить товары!"));
+        }
+      }
     }
-  }
-  finally {
-    if (yield cancelled()) {
-      abortController.abort();
+    finally {
+      if (yield cancelled()) {
+        abortController.abort();
+      }
+
+      if (attempt > 1) {
+        let delayTime =
+          retryRequestConfig.initialDelay * Math.pow(retryRequestConfig.exponent, attempt - 1);
+        delayTime = Math.min(delayTime, retryRequestConfig.maxDelay);
+        delayTime += Math.random() * 200;
+
+        console.log(`Каталог товаров - попытка ${attempt}: ${delayTime}ms`);
+        yield delay(delayTime);
+      }
     }
   }
 }

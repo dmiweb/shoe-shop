@@ -1,10 +1,19 @@
+import { useEffect } from "react";
+import { useAppDispatch } from "../hooks";
+import { cancelRequestCategories } from "../slices/categoriesSlice";
 import { Banner } from "../components";
 
 const AboutPage = () => {
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(cancelRequestCategories());
+  }, []);
+
   return (
     <>
       <Banner />
-      
+
       <section className="top-sales">
         <h2 className="text-center">О магазине</h2>
         <p>

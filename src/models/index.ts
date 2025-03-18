@@ -1,3 +1,9 @@
+export type RetryRequestConfig = {
+  initialDelay: number;
+  maxDelay: number;
+  exponent: number;
+}
+
 export type CustomError = Error & {
   status?: number;
 }

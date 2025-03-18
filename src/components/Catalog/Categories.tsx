@@ -13,7 +13,7 @@ const Categories = () => {
 
   useEffect(() => {
     dispatch(requestCategories());
-  }, [dispatch]);
+  }, []);
 
   const handleClickCategoryAll = (event: React.MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
