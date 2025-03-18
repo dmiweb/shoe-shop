@@ -33,7 +33,7 @@ export const categoriesSlice = createSlice({
       state.error = null;
       state.loading = false;
     }),
-    cancelRequestCategories: create.reducer((state, _: PayloadAction) => {
+    cancelRequestCategories: create.reducer((state) => {
       state.selectedCategory = null;
       state.error = null;
       state.loading = false;
