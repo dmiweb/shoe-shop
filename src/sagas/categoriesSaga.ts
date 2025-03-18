@@ -45,15 +45,19 @@ function* handleGetCategoriesSaga(): Generator {
   }
 }
 
-function* watchGetCategoriesSaga() {
-  let task: Task | undefined;
-  while (true) {
-    yield take(requestCategories.type);
-    task = yield fork(handleGetCategoriesSaga);
+function* watchGetCategoriesSaga(): Generator {
+  let task: Task | null = null;
 
-    yield take(cancelRequestCategories.type);
+  while (true) {
+    const action = yield take([requestCategories.type, cancelRequestCategories.type]);
+
     if (task) {
       yield cancel(task);
+      task = null;
+    }
+
+    if (action.type === requestCategories.type) {
+      task = yield fork(handleGetCategoriesSaga);
     }
   }
 }

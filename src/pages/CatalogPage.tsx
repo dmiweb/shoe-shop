@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
 import { requestCatalog, requestMoreCatalogItems } from "../slices/catalogSlice";
-import { cancelRequestCategories, selectCategory } from "../slices/categoriesSlice";
+import { selectCategory } from "../slices/categoriesSlice";
 import { Section, Loader, Error, Banner, Search, Categories, Catalog, LoadMoreButton } from "../components";
 
 const CatalogPage = () => {
@@ -11,7 +11,6 @@ const CatalogPage = () => {
 
 
   useEffect(() => {
-    dispatch(cancelRequestCategories());
     dispatch(selectCategory(null));
     dispatch(requestCatalog());
   }, [dispatch]);
