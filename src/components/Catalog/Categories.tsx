@@ -13,6 +13,7 @@ const Categories = () => {
 
   useEffect(() => {
     dispatch(requestCategories());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleClickCategoryAll = (event: React.MouseEvent<HTMLAnchorElement>) => {
