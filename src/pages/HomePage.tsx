@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { requestCatalog, requestMoreCatalogItems, saveSearchQuery } from "../slices/catalogSlice";
-import { requestTopSales } from "../slices/topSalesSlice";
-import { selectCategory } from "../slices/categoriesSlice";
+import { requestCatalog, requestMoreCatalogItems, saveSearchQuery, cancelRequestCatalog } from "../slices/catalogSlice";
+import { requestTopSales, cancelRequestTopSales } from "../slices/topSalesSlice";
+import { selectCategory, cancelRequestCategories } from "../slices/categoriesSlice";
 import { Loader, Error, Section, Banner, TopSales, Categories, Catalog, LoadMoreButton } from "../components";
 
 const HomePage = () => {
@@ -17,7 +17,14 @@ const HomePage = () => {
 
     dispatch(requestTopSales());
     dispatch(requestCatalog());
-  }, [dispatch]);
+
+    return () => {
+      dispatch(cancelRequestCategories());
+      dispatch(cancelRequestCatalog());
+      dispatch(cancelRequestTopSales());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLoadMoreButton = () => {
     dispatch(requestMoreCatalogItems(catalog.length));

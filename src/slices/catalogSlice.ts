@@ -47,6 +47,10 @@ export const catalogSlice = createSlice({
     saveSearchQuery: create.reducer((state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     }),
+    cancelRequestCatalog: create.reducer((state) => {
+      state.error = null;
+      state.loading = false;
+    }),
   })
 });
 
@@ -57,6 +61,7 @@ export const {
   getCatalogSuccess,
   getCatalogFailure,
   saveSearchQuery,
+  cancelRequestCatalog
 } = catalogSlice.actions;
 
 export default catalogSlice.reducer;

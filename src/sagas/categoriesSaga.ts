@@ -1,5 +1,4 @@
-import { call, put, spawn, cancelled, delay, cancel, take, fork } from "redux-saga/effects";
-import { Task } from "redux-saga";
+import { call, put, spawn, cancelled, delay, take, race } from "redux-saga/effects";
 import { requestCategories, getCategoriesSuccess, getCategoriesFailure, cancelRequestCategories } from "../slices/categoriesSlice";
 import { fetchData } from "../api";
 import { TCategoryProducts, RetryRequestConfig } from "../models";
@@ -46,19 +45,12 @@ function* handleGetCategoriesSaga(): Generator {
 }
 
 function* watchGetCategoriesSaga(): Generator {
-  let task: Task | null = null;
-
   while (true) {
-    const action = yield take([requestCategories.type, cancelRequestCategories.type]);
-
-    if (task) {
-      yield cancel(task);
-      task = null;
-    }
-
-    if (action.type === requestCategories.type) {
-      task = yield fork(handleGetCategoriesSaga);
-    }
+    yield take(requestCategories.type)
+    yield race({
+      task: call(handleGetCategoriesSaga),
+      cancel: take(cancelRequestCategories.type)
+    })
   }
 }
 

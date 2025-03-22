@@ -27,6 +27,10 @@ export const topSalesSlice = createSlice({
       state.topSalesError = action.payload;
       state.topSalesLoading = true;
     }),
+    cancelRequestTopSales: create.reducer((state) => {
+      state.topSalesError = null;
+      state.topSalesLoading = false;
+    }),
   })
 });
 
@@ -34,5 +38,6 @@ export const {
   requestTopSales,
   getTopSalesSuccess,
   getTopSalesFailure,
+  cancelRequestTopSales
 } = topSalesSlice.actions;
 export default topSalesSlice.reducer;

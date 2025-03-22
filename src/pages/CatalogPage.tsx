@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../hooks";
-import { requestCatalog, requestMoreCatalogItems } from "../slices/catalogSlice";
-import { selectCategory } from "../slices/categoriesSlice";
+import { requestCatalog, requestMoreCatalogItems, cancelRequestCatalog } from "../slices/catalogSlice";
+import { selectCategory, cancelRequestCategories } from "../slices/categoriesSlice";
 import { Section, Loader, Error, Banner, Search, Categories, Catalog, LoadMoreButton } from "../components";
 
 const CatalogPage = () => {
@@ -13,7 +13,13 @@ const CatalogPage = () => {
   useEffect(() => {
     dispatch(selectCategory(null));
     dispatch(requestCatalog());
-  }, [dispatch]);
+
+    return () => {
+      dispatch(cancelRequestCategories());
+      dispatch(cancelRequestCatalog());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleLoadMoreButton = () => {
     dispatch(requestMoreCatalogItems(catalog.length));

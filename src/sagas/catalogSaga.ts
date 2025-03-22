@@ -1,6 +1,6 @@
-import { put, spawn, takeLatest, cancelled, call, delay, select } from "redux-saga/effects";
+import { put, spawn, takeLatest, cancelled, call, delay, select, take, race } from "redux-saga/effects";
 import { PayloadAction } from '@reduxjs/toolkit';
-import { requestCatalog, requestMoreCatalogItems, requestCatalogByCategory, getCatalogSuccess, getCatalogFailure } from "../slices/catalogSlice";
+import { requestCatalog, requestMoreCatalogItems, requestCatalogByCategory, getCatalogSuccess, getCatalogFailure, cancelRequestCatalog } from "../slices/catalogSlice";
 import { fetchData } from "../api";
 import { TCatalogItem, TGetParams, RetryRequestConfig } from "../models";
 
@@ -79,16 +79,41 @@ function* handleGetCatalogSaga(action: HandleGetCatalogAction): Generator {
   }
 }
 
+function* createCancellableWatcher(
+  requestAction: string,
+  cancelAction: string,
+  handleSaga: (action: HandleGetCatalogAction) => Generator
+) {
+  yield takeLatest(requestAction, function* (action: HandleGetCatalogAction) {
+    yield race({
+      task: call(handleSaga, action),
+      cancel: take(cancelAction),
+    });
+  });
+}
+
 function* watchGetCatalogSaga() {
-  yield takeLatest(requestCatalog.type, handleGetCatalogSaga);
+  yield createCancellableWatcher(
+    requestCatalog.type,
+    cancelRequestCatalog.type,
+    handleGetCatalogSaga
+  );
 }
 
 function* watchGetMoreCatalogItemsSaga() {
-  yield takeLatest(requestMoreCatalogItems.type, handleGetCatalogSaga);
+  yield createCancellableWatcher(
+    requestMoreCatalogItems.type,
+    cancelRequestCatalog.type,
+    handleGetCatalogSaga
+  );
 }
 
 function* watchGetCatalogByCategorySaga() {
-  yield takeLatest(requestCatalogByCategory.type, handleGetCatalogSaga);
+  yield createCancellableWatcher(
+    requestCatalogByCategory.type,
+    cancelRequestCatalog.type,
+    handleGetCatalogSaga
+  );
 }
 
 export default function* catalogSaga() {

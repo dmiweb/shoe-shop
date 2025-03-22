@@ -1,16 +1,6 @@
-import { useEffect } from "react";
-import { useAppDispatch } from "../hooks";
-import { cancelRequestCategories } from "../slices/categoriesSlice";
 import { Banner } from "../components";
 
 const AboutPage = () => {
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(cancelRequestCategories());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   return (
     <>
       <Banner />

@@ -1,5 +1,5 @@
-import { call, put, spawn, takeLatest, cancelled, delay } from "redux-saga/effects";
-import { requestTopSales, getTopSalesSuccess, getTopSalesFailure } from "../slices/topSalesSlice";
+import { call, put, spawn, take, race, cancelled, delay } from "redux-saga/effects";
+import { requestTopSales, getTopSalesSuccess, getTopSalesFailure, cancelRequestTopSales } from "../slices/topSalesSlice";
 import { fetchData } from "../api";
 import { TProduct, RetryRequestConfig } from "../models";
 
@@ -45,8 +45,18 @@ function* handleGetProductsSaga(): Generator {
   }
 }
 
-function* watchGetProductsSaga() {
-  yield takeLatest(requestTopSales.type, handleGetProductsSaga);
+// function* watchGetProductsSaga() {
+//   yield takeLatest(requestTopSales.type, handleGetProductsSaga);
+// }
+
+function* watchGetProductsSaga(): Generator {
+  while (true) {
+    yield take(requestTopSales.type)
+    yield race({
+      task: call(handleGetProductsSaga),
+      cancel: take(cancelRequestTopSales.type)
+    })
+  }
 }
 
 export default function* productsSaga() {
